@@ -1,3 +1,16 @@
+# Build de Maven
 target/
 out/
 *.class
+
+# Metadatos del IDE
+.idea/
+*.iml
+.vscode/
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
+
+# Credenciales locales - NO versionar
+src/main/resources/config.properties
