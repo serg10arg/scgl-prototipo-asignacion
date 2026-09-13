@@ -70,26 +70,3 @@ CREATE TABLE asignacion (
                             CONSTRAINT fk_asig_conductor FOREIGN KEY (id_conductor)
                                 REFERENCES conductor(id_conductor)
 ) ENGINE=InnoDB;
-
--- =====================================================================
--- Datos de demostracion (para ejercitar los 3 escenarios de la App)
--- =====================================================================
-
--- Conductores
-INSERT INTO conductor (nombre, num_licencia, tipo_licencia, fecha_venc_licencia, horas_acumuladas) VALUES
-                                                                                                       ('Ana Gomez',   'LIC-1001', 'E1', '2027-12-31', 20.00),  -- id 1: apto
-                                                                                                       ('Luis Pereyra','LIC-1002', 'E1', '2027-06-30', 40.00);  -- id 2: 40 h en la semana; +6 h supera el limite de 44 h (RN2)
-
--- Vehiculos
-INSERT INTO vehiculo (patente, tipo, capacidad_kg, km_actual, km_ultimo_mantenimiento, umbral_mantenimiento_km, estado) VALUES
-                                                                                                                            ('AA123BB', 'PESADO', 20000.00, 145000, 140000, 10000, 'OPERATIVO'),      -- id 1: operativo, sin mant.
-                                                                                                                            ('CC456DD', 'PESADO', 20000.00, 152000, 140000, 10000, 'OPERATIVO');      -- id 2: km-140k=12k >= 10k -> requiere mant. (RN4)
-
--- Una orden preventiva abierta coherente con el vehiculo 2
-INSERT INTO orden_mantenimiento (id_vehiculo, tipo, estado, fecha) VALUES
-    (2, 'PREVENTIVO', 'ABIERTA', CURRENT_DATE);
-
--- Solicitudes
-INSERT INTO solicitud_envio (origen, destino, peso_kg, ventana_inicio, ventana_fin) VALUES
-                                                                                        ('Mendoza','Cordoba', 15000.00, '2026-08-15 08:00:00', '2026-08-15 20:00:00'), -- id 1
-                                                                                        ('Mendoza','Rosario', 15000.00, '2026-08-16 08:00:00', '2026-08-16 22:00:00'); -- id 2
