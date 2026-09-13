@@ -34,9 +34,10 @@ Si una validación falla, se lanza una excepción de dominio y **no se persiste 
 
 ## Cómo ejecutar
 
-1. Crear la base y los datos de demo:
+1. Crear la base y las tablas, y cargar los datos de demostracion:
    ```
    mysql -u root -p < db/schema.sql
+   mysql -u root -p < db/datos.sql
    ```
 2. Ajustar `src/main/resources/config.properties` (URL, usuario, password).
 3. Compilar y ejecutar (con el driver Connector/J en el classpath):
@@ -63,3 +64,10 @@ Cada regla y requerimiento implementado se comenta en el código con su etiqueta
 La única dependencia externa es el **driver JDBC** de MySQL (Connector/J), que es un
 *driver*, no un framework de alto nivel — por lo que se respeta la restricción tecnológica
 del proyecto (RNF9).
+
+## Scripts SQL
+
+- `db/schema.sql` — creacion de la base y las tablas (DDL).
+- `db/datos.sql` — datos de demostracion (insercion).
+- `db/consultas.sql` — consultas de explotacion (historial, pendientes, mantenimiento, indicadores).
+- `db/borrado.sql` — borrado de registros y verificacion de integridad referencial.
