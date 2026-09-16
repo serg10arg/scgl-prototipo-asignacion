@@ -178,6 +178,12 @@ trabajo o de generar documentación, para no desalinear el informe del código r
       estado y evitar la desalineación a futuro.
 - **Verificación:** informe, repo y guía de coloquio coherentes entre sí (mismos nombres,
   mismo modelo, mismas salidas).
+- **Ajuste por devolución del docente (2026-09-15):** el docente validó centrar las
+  realizaciones y el diagrama de secuencia en CU-02 (no hace falta desarrollar los CU de ABM),
+  pero pidió que **el diagrama de clases sea integral y refleje todo el modelado**. Se rehízo
+  el diagrama de clases de dominio (Figura 2) como **modelo integral** —incluye
+  `OrdenMantenimiento` y todas las asociaciones—, diferenciándolo del prototipo operacional
+  (que implementa CU-02).
 - **Siguiente:** Fase 6 · Cierre de viaje y alerta de mantenimiento.
 
 ---
