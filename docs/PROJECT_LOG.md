@@ -184,7 +184,12 @@ trabajo o de generar documentación, para no desalinear el informe del código r
   el diagrama de clases de dominio (Figura 2) como **modelo integral** —incluye
   `OrdenMantenimiento` y todas las asociaciones—, diferenciándolo del prototipo operacional
   (que implementa CU-02).
-- **Siguiente:** Fase 6 · Cierre de viaje y alerta de mantenimiento.
+- **Resultado TP2: 100/100.** Devolución del docente: presentación clara y completa; diagramas
+  de secuencia y documentación correctos; repositorio accesible; código comprensible con su
+  explicación. Única observación: **detalles menores de normalización en el DER** que —según el
+  propio docente— **no afectan la performance** a este volumen de datos. Es un aporte: **no
+  requiere reentrega** y se complementa en las próximas entregas.
+- **Siguiente:** ver sección «Pendiente — TP3 y TP4».
 
 ---
 
@@ -261,6 +266,10 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 - **Archivos** (persistencia complementaria, opcional) → **TP4**.
 - **`OrdenMantenimiento` sin clase de dominio** (solo existe la tabla): conviene sumarla al
   ampliar la cobertura (TP3/TP4).
+- **Afinar la normalización del DER** (observación menor del docente en TP2, sin impacto de
+  performance a este volumen): a confirmar el detalle con el docente. Candidatos probables:
+  llevar catálogos/estados a tablas de referencia en lugar de ENUM, o separar la licencia del
+  conductor en su propia tabla. Se complementa en TP3/TP4; no exige reentrega del TP2.
 - **Sin pruebas automatizadas:** los `CP-xx` del informe son especificaciones, no JUnit
   (mejora deseable, no exigida por las consignas).
 - **Cableado por `new`/`ServiceLoader`:** decisión deliberada por RNF-09; el patrón de diseño
