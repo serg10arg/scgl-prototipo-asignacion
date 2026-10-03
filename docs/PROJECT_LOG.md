@@ -238,13 +238,43 @@ trabajo o de generar documentación, para no desalinear el informe del código r
   EOF probado sin base de datos, pasando por pipe las líneas `abc` y `9` a
   `java -cp target/classes com.logisticaandina.scgl.App` y cerrando la entrada: rechaza
   las entradas inválidas, muestra «Entrada finalizada.» y termina con exit 0.
-  Pendiente la ejecución interactiva contra MySQL para evidenciar las opciones (capturas
-  para el informe).
+- **Ejecución contra MySQL 8.0.41 (2026-10-04):** con `schema.sql` + `datos.sql` cargados
+  (solo la solicitud 2 queda PENDIENTE, porque `datos.sql` ya asigna la 1), se corrió la
+  opción 1 dos veces sobre la solicitud 2:
+    - **Rechazo RN4** (vehículo 2, conductor 1, 6 h): «RECHAZADA (no se persiste): Vehiculo
+      CC456DD requiere mantenimiento preventivo (umbral de km superado).» (12.000 km desde el
+      último mantenimiento, umbral 10.000).
+    - **Asignación válida** (vehículo 1, conductor 1, 6 h): «OK -> asignacion #2 confirmada y
+      persistida (vehiculo AA123BB, conductor Ana Gomez).»
+    - **En la base:** solo se agregó la asignación #2; la solicitud 2 pasó a ASIGNADA y las
+      horas de Ana Gomez de 20 a 26 (la transacción de `AsignacionDAO` aplicó los tres cambios).
+    - **Orden de la demo:** primero el rechazo y después la válida; al revés, la solicitud 2
+      queda asignada y no hay otra pendiente para mostrar el rechazo.
+- **Hallazgo y corrección: fechas corridas por zona horaria (2026-10-04).**
+    - **Síntoma:** la asignación se guardó con `fecha_hora` 5 h antes de la hora real
+      (00:27 local → 19:27 del día anterior).
+    - **Causa:** `setTimestamp`/`getTimestamp`/`getDate` convertían entre la zona de la JVM
+      (equipo en `Romance Standard Time`, UTC+2) y la de la conexión (`serverTimezone=
+      America/Argentina/Buenos_Aires`, UTC-3). También afectaba la **lectura** de
+      `ventana_inicio`/`ventana_fin` y, en casos límite, la fecha de vencimiento de la licencia.
+    - **Corrección:** las columnas `DATETIME`/`DATE` no tienen zona, así que los DAO pasan a
+      usar `java.time` directo: `setObject(LocalDateTime)` en `AsignacionDAO` y
+      `getObject(..., LocalDateTime.class / LocalDate.class)` en `SolicitudDAO` y
+      `ConductorDAO`, que Connector/J transfiere sin conversión. No cambia la URL ni
+      `config.properties`.
+    - **Verificación:** las ventanas de la solicitud 2 se leen `08:00 → 22:00` (igual que
+      `datos.sql`) y una asignación registrada a las 00:50:42 se guardó como 00:50:44. La
+      prueba de escritura se hizo en una base temporal (`scgl_tzcheck`, ya eliminada).
+    - Después se recargaron `schema.sql` + `datos.sql` en `scgl` para descartar la asignación
+      guardada con la hora corrida y dejar la solicitud 2 PENDIENTE.
+- **Pendiente:** la captura de consola para el informe (evidencia de ejecución), hecha con
+  el código ya corregido y siguiendo el orden de la demo indicado arriba.
 - **Commits (2026-10-03):** `feat(persistencia): listados de solo lectura en los DAO (listarTodos, listarPendientes)`,
   `feat(util): ordenamiento (seleccion, insercion) y busqueda (binaria, lineal) a mano`,
   `feat(app): menu de seleccion interactivo del prototipo (CU-02, listados y busquedas)`,
   `refactor(app): App delega la interaccion en MenuConsola`, más este registro en la bitácora.
-  Ajuste (2026-10-04): `fix(app): salida prolija ante EOF y encabezado honesto en el listado de vehiculos`.
+  Ajustes (2026-10-04): `fix(app): salida prolija ante EOF y encabezado honesto en el listado de vehiculos`,
+  `fix(persistencia): fechas con java.time en JDBC, sin conversion de zona horaria`.
 - **Siguiente:** documento y presentación del TP3 (`CABRERA-SERGIO-AP3`); luego TP4.
 
 ---
