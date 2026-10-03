@@ -8,6 +8,7 @@ import com.logisticaandina.scgl.util.Algoritmos;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -44,17 +45,23 @@ public class MenuConsola {
         System.out.println("=== SCGL - Sistema Centralizado de Gestion Logistica (prototipo) ===");
         boolean salir = false;
         while (!salir) {
-            mostrarMenu();
-            int opcion = leerEntero("Elija una opcion: ");
-            switch (opcion) {
-                case 1 -> registrarAsignacion();
-                case 2 -> listarSolicitudesPendientes();
-                case 3 -> listarVehiculosOrdenadosPorCapacidad();
-                case 4 -> listarConductores();
-                case 5 -> buscarVehiculoPorPatente();
-                case 6 -> buscarConductorPorNombre();
-                case 0 -> salir = true;
-                default -> System.out.println("  Opcion invalida. Intente nuevamente.");
+            try {
+                mostrarMenu();
+                int opcion = leerEntero("Elija una opcion: ");
+                switch (opcion) {
+                    case 1 -> registrarAsignacion();
+                    case 2 -> listarSolicitudesPendientes();
+                    case 3 -> listarVehiculosOrdenadosPorCapacidad();
+                    case 4 -> listarConductores();
+                    case 5 -> buscarVehiculoPorPatente();
+                    case 6 -> buscarConductorPorNombre();
+                    case 0 -> salir = true;
+                    default -> System.out.println("  Opcion invalida. Intente nuevamente.");
+                }
+            } catch (NoSuchElementException e) {
+                // Entrada cerrada (EOF: Ctrl+D / Ctrl+Z o fin de un pipe): salir prolijo.
+                System.out.println("\n  Entrada finalizada.");
+                salir = true;
             }
         }
         System.out.println("\nFin del programa. Hasta luego.");
@@ -92,7 +99,7 @@ public class MenuConsola {
                 return;
             }
 
-            System.out.println("Vehiculos disponibles:");
+            System.out.println("Vehiculos registrados (se validara su disponibilidad al confirmar):");
             imprimirVehiculos(vehiculoDAO.listarTodos());
             int idVeh = leerEntero("Id del vehiculo: ");
             Vehiculo vehiculo = vehiculoDAO.buscarPorId(idVeh);
