@@ -16,7 +16,7 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 - **Nomenclatura de artefactos** (para mantener trazabilidad con el informe): `RF-xx`
   (req. funcional), `RNF-xx` (req. no funcional), `RN-x` (regla de negocio), `CU-xx`
   (caso de uso), `CP-xx` (caso de prueba).
-- **Última actualización:** 2026-09-13.
+- **Última actualización:** 2026-10-03.
 
 ---
 
@@ -29,7 +29,9 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 | Persistencia JDBC + transacción atómica (`AsignacionDAO.guardarEnTransaccion`) | ✅ |
 | Base de datos: 5 tablas InnoDB + 4 FK (`db/schema.sql`) | ✅ |
 | Scripts SQL de inserción / consulta / borrado (`db/datos.sql`, `consultas.sql`, `borrado.sql`) | ✅ (Fase 4) |
-| CU-02 «Asignar viaje» de punta a punta (escenarios A/B/C por consola) | ✅ |
+| CU-02 «Asignar viaje» de punta a punta (desde el menú interactivo) | ✅ (Fase 6) |
+| Menú de selección interactivo por consola (`MenuConsola`) | ✅ (Fase 6) |
+| Ordenación y búsqueda a mano (`util/Algoritmos`) | ✅ (Fase 6) |
 | Cierre de viaje + alerta de mantenimiento (RF-07/RF-08) | ⛔ pendiente |
 | Módulo de mantenimiento en código (RF-09) — hoy solo existe la tabla | ⛔ pendiente |
 | Consultas/indicadores desde la app (RF-10/RF-11) | ⛔ pendiente |
@@ -189,7 +191,48 @@ trabajo o de generar documentación, para no desalinear el informe del código r
   explicación. Única observación: **detalles menores de normalización en el DER** que —según el
   propio docente— **no afectan la performance** a este volumen de datos. Es un aporte: **no
   requiere reentrega** y se complementa en las próximas entregas.
-- **Siguiente:** ver sección «Pendiente — TP3 y TP4».
+- **Siguiente:** Fase 6 · TP3 · Menú de selección interactivo.
+
+---
+
+## Fase 6 · TP3 · Menú de selección interactivo
+
+- **Estado:** ✅ código integrado (2026-10-03 · TP3) — falta el documento/presentación del TP3
+- **Entregado:**
+    - **`MenuConsola`** (paquete raíz): programa interactivo por consola con bucle `while` +
+      `switch`. Opciones: 1) registrar asignación (CU-02: elige solicitud pendiente, vehículo,
+      conductor y horas; valida RN1–RN5 en `MotorAsignacion` antes de persistir); 2) listar
+      solicitudes pendientes; 3) listar vehículos ordenados por capacidad; 4) listar
+      conductores; 5) buscar vehículo por patente; 6) buscar conductor por nombre; 0) salir.
+      Entrada robusta (`leerEntero`/`leerDouble` reintentan ante valores inválidos; `leerDouble`
+      acepta coma o punto y exige valor positivo). Captura `AsignacionInvalidaException` (rechazo,
+      no persiste) y `PersistenciaException` por opción, sin cortar el programa.
+    - **`util/Algoritmos`** (clase de utilidades `final`, constructor privado), implementados a
+      mano sin `Collections.sort` ni Streams: **selección** (capacidad desc., O(n²)),
+      **inserción** (patente asc., precondición de la binaria), **búsqueda binaria** por patente
+      (O(log n)) y **búsqueda lineal** por coincidencia parcial de nombre (O(n)).
+    - **Listados de solo lectura en los DAO:** `VehiculoDAO.listarTodos()`,
+      `ConductorDAO.listarTodos()` y `SolicitudDAO.listarPendientes()` (devuelven
+      `List`/`ArrayList`). Se extrajo un `mapear(ResultSet)` privado en `ConductorDAO` y
+      `SolicitudDAO` (como ya tenía `VehiculoDAO`), reutilizado por `buscarPorId` y los listados.
+    - **`App` fino:** solo `new MenuConsola().iniciar()`. La demo de 3 escenarios fijos
+      (A/B/C) se reemplaza por la opción 1 del menú; `LIMITE_LEGAL_HORAS = 44.0` se mudó de
+      `App` a `MenuConsola` (sigue parametrizado, RNF-04).
+- **Decisiones y hallazgos:**
+    - La interacción se concentra en `MenuConsola`; la validación sigue en `MotorAsignacion` y
+      el acceso a datos en los DAO (misma separación de responsabilidades de TP1/TP2).
+    - Los listados son de **solo lectura**: la única escritura sigue siendo
+      `AsignacionDAO.guardarEnTransaccion` (CU-02). El CRUD completo queda para TP4.
+    - Cubre de la consigna TP3: **menú de selección**, estructuras condicionales/repetitivas,
+      manejo de excepciones y **ordenación/búsqueda** (opcional). La tabla del menú usa
+      polimorfismo en el punto de uso (`getTipo()`, `costoPorKilometro()`).
+- **Verificación:** `git apply --check` limpio y `mvn -q compile` en verde. Pendiente la
+  ejecución interactiva contra MySQL para evidenciar las opciones (capturas para el informe).
+- **Commits (2026-10-03):** `feat(persistencia): listados de solo lectura en los DAO (listarTodos, listarPendientes)`,
+  `feat(util): ordenamiento (seleccion, insercion) y busqueda (binaria, lineal) a mano`,
+  `feat(app): menu de seleccion interactivo del prototipo (CU-02, listados y busquedas)`,
+  `refactor(app): App delega la interaccion en MenuConsola`, más este registro en la bitácora.
+- **Siguiente:** documento y presentación del TP3 (`CABRERA-SERGIO-AP3`); luego TP4.
 
 ---
 
@@ -214,9 +257,9 @@ trabajo o de generar documentación, para no desalinear el informe del código r
     - Algoritmos de ordenación y búsqueda (opcional).
 - **Estado en el repo:** los pilares POO (herencia/polimorfismo en la jerarquía `Vehiculo`,
   encapsulamiento en el dominio, abstracción con `Vehiculo` abstracta) y el manejo de
-  excepciones **ya están** (Fases 1-2). **Falta:** el **menú de selección interactivo** (hoy
-  `App` corre 3 escenarios fijos en command mode) y ampliar la cobertura funcional más allá
-  de la asignación.
+  excepciones **ya están** (Fases 1-2). El **menú de selección interactivo** y los algoritmos
+  de ordenación/búsqueda **ya están** (Fase 6). **Falta:** el documento/presentación del TP3 y
+  ampliar la cobertura funcional más allá de la asignación.
 - **Formato:** PDF A4 Calibri 11, portada, `CABRERA-SERGIO-AP3.PDF`
   (⚠️ la plantilla de la consigna dice literalmente «AP1»; se asume **AP3** por el patrón AP1/AP2 —
   confirmar con la cátedra), enlace GitHub, APA; entrega incremental (correcciones previas).
@@ -258,11 +301,11 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 
 ## Deuda conocida (se resuelve dentro de TP3/TP4)
 
-- **Menú de selección interactivo:** hoy `App` ejecuta 3 escenarios fijos → lo pide **TP3**.
 - **Cobertura funcional parcial:** implementado el núcleo de asignación (RF-04/05/06); el CRUD
   completo y la presentación de resultados en la interfaz → **TP4**.
 - **Patrón de diseño:** aún no hay uno elegido/justificado explícitamente → **TP4**.
-- **Colecciones (`ArrayList`/arreglos)** en la capa de aplicación → **TP4**.
+- **Colecciones (`ArrayList`/arreglos)** en la capa de aplicación: `List`/`ArrayList` ya se
+  usan en los listados y en `MenuConsola` (Fase 6); falta sumar arreglos → **TP4**.
 - **Archivos** (persistencia complementaria, opcional) → **TP4**.
 - **`OrdenMantenimiento` sin clase de dominio** (solo existe la tabla): conviene sumarla al
   ampliar la cobertura (TP3/TP4).
