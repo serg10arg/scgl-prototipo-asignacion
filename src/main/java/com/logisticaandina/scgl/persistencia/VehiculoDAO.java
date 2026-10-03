@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Acceso a datos de Vehiculo. Reconstruye la subclass segun el discriminador 'tipo'. */
 public class VehiculoDAO {
@@ -21,6 +23,22 @@ public class VehiculoDAO {
             }
         } catch (SQLException e) {
             throw new PersistenciaException("Error al buscar vehiculo id=" + id, e);
+        }
+    }
+
+    /** Lista todos los vehiculos (solo lectura; alimenta el menu interactivo del TP3). */
+    public List<Vehiculo> listarTodos() throws PersistenciaException {
+        String sql = "SELECT * FROM vehiculo ORDER BY id_vehiculo";
+        List<Vehiculo> lista = new ArrayList<>();
+        try (Connection c = ConexionMySQL.obtener();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                lista.add(mapear(rs));
+            }
+            return lista;
+        } catch (SQLException e) {
+            throw new PersistenciaException("Error al listar vehiculos", e);
         }
     }
 
