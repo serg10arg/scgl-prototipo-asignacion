@@ -16,7 +16,7 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 - **Nomenclatura de artefactos** (para mantener trazabilidad con el informe): `RF-xx`
   (req. funcional), `RNF-xx` (req. no funcional), `RN-x` (regla de negocio), `CU-xx`
   (caso de uso), `CP-xx` (caso de prueba).
-- **Última actualización:** 2026-10-03.
+- **Última actualización:** 2026-10-04.
 
 ---
 
@@ -226,12 +226,25 @@ trabajo o de generar documentación, para no desalinear el informe del código r
     - Cubre de la consigna TP3: **menú de selección**, estructuras condicionales/repetitivas,
       manejo de excepciones y **ordenación/búsqueda** (opcional). La tabla del menú usa
       polimorfismo en el punto de uso (`getTipo()`, `costoPorKilometro()`).
-- **Verificación:** `git apply --check` limpio y `mvn -q compile` en verde. Pendiente la
-  ejecución interactiva contra MySQL para evidenciar las opciones (capturas para el informe).
+- **Ajuste posterior (2026-10-04):**
+    - **Salida prolija ante EOF:** el bucle de `iniciar()` captura `NoSuchElementException`
+      (entrada cerrada con Ctrl+D / Ctrl+Z o fin de un pipe), informa «Entrada finalizada.» y
+      termina normalmente en lugar de abortar con una excepción. Cubre también un EOF en medio
+      de la opción 1, porque esa excepción no la atrapan los `catch` de la opción y llega al bucle.
+    - **Encabezado honesto en la opción 1:** «Vehiculos disponibles:» pasa a «Vehiculos
+      registrados (se validara su disponibilidad al confirmar):», ya que el listado incluye
+      unidades en taller o con mantenimiento pendiente (las rechaza `MotorAsignacion`, RN1/RN4).
+- **Verificación:** `git apply --check` limpio y `mvn -q compile` en verde (en ambos parches).
+  EOF probado sin base de datos, pasando por pipe las líneas `abc` y `9` a
+  `java -cp target/classes com.logisticaandina.scgl.App` y cerrando la entrada: rechaza
+  las entradas inválidas, muestra «Entrada finalizada.» y termina con exit 0.
+  Pendiente la ejecución interactiva contra MySQL para evidenciar las opciones (capturas
+  para el informe).
 - **Commits (2026-10-03):** `feat(persistencia): listados de solo lectura en los DAO (listarTodos, listarPendientes)`,
   `feat(util): ordenamiento (seleccion, insercion) y busqueda (binaria, lineal) a mano`,
   `feat(app): menu de seleccion interactivo del prototipo (CU-02, listados y busquedas)`,
   `refactor(app): App delega la interaccion en MenuConsola`, más este registro en la bitácora.
+  Ajuste (2026-10-04): `fix(app): salida prolija ante EOF y encabezado honesto en el listado de vehiculos`.
 - **Siguiente:** documento y presentación del TP3 (`CABRERA-SERGIO-AP3`); luego TP4.
 
 ---
