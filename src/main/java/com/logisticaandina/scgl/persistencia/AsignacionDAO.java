@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 
 /** Persiste la asignacion como una unica transaccion atomica (RNF1). */
 public class AsignacionDAO {
@@ -30,7 +29,7 @@ public class AsignacionDAO {
                 ps.setInt(1, a.getSolicitud().getId());
                 ps.setInt(2, a.getVehiculo().getId());
                 ps.setInt(3, a.getConductor().getId());
-                ps.setTimestamp(4, Timestamp.valueOf(a.getFechaHora()));
+                ps.setObject(4, a.getFechaHora());      // LocalDateTime -> DATETIME, sin conversion de zona
                 ps.setDouble(5, a.getHorasEstimadas());
                 ps.setString(6, a.getEstado().name());
                 ps.executeUpdate();

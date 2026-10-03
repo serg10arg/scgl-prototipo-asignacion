@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class ConductorDAO {
         Licencia lic = new Licencia(
                 rs.getString("num_licencia"),
                 rs.getString("tipo_licencia"),
-                rs.getDate("fecha_venc_licencia").toLocalDate());
+                rs.getObject("fecha_venc_licencia", LocalDate.class));
         return new Conductor(
                 rs.getInt("id_conductor"),
                 rs.getString("nombre"),

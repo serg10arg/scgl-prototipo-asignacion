@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +50,8 @@ public class SolicitudDAO {
                 rs.getString("origen"),
                 rs.getString("destino"),
                 rs.getDouble("peso_kg"),
-                rs.getTimestamp("ventana_inicio").toLocalDateTime(),
-                rs.getTimestamp("ventana_fin").toLocalDateTime(),
+                rs.getObject("ventana_inicio", LocalDateTime.class),
+                rs.getObject("ventana_fin", LocalDateTime.class),
                 EstadoSolicitud.valueOf(rs.getString("estado")));
     }
 }
