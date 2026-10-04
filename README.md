@@ -4,7 +4,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8-blue)
 ![Build](https://img.shields.io/badge/Maven-3.9%2B-C71A36)
 ![Metodología](https://img.shields.io/badge/Metodolog%C3%ADa-PUD-2E6E5E)
-![Estado](https://img.shields.io/badge/Estado-TP2%20completado-brightgreen)
+![Estado](https://img.shields.io/badge/Estado-C%C3%B3digo%20TP3%20listo-brightgreen)
 
 > Prototipo operacional del **Sistema Centralizado de Gestión Logística y Mantenimiento de
 > Flotas (SCGL-Backend)** de *Logística Andina S.R.L.*, desarrollado en **Java (orientado a
@@ -87,7 +87,11 @@ Diseño por capas, con las reglas de negocio **encapsuladas** en el dominio:
   en `AsignacionDAO.guardarEnTransaccion()`.
 - **`excepciones/`** — Jerarquía de excepciones de validación (`AsignacionInvalidaException` y
   derivadas) y de persistencia (`PersistenciaException`).
-- **`App.java`** — Punto de entrada (demostración de 3 escenarios: 1 válido, 2 rechazos).
+- **`util/`** — `Algoritmos`: ordenación (selección, inserción) y búsqueda (binaria, lineal)
+  implementadas a mano (TP3).
+- **`MenuConsola.java`** — **Menú de selección interactivo** por consola: registrar asignación
+  (CU-02), listados de solo lectura y búsquedas. Concentra la interacción con el usuario.
+- **`App.java`** — Punto de entrada; crea e inicia `MenuConsola`.
 
 ## 5. Modelo de datos y reglas de negocio
 
@@ -140,11 +144,26 @@ Reglas de negocio principales (etiquetadas en el código y en el modelo):
    mvn -q compile exec:java -Dexec.mainClass=com.logisticaandina.scgl.App
    ```
 
-**Salida esperada:**
+**Salida esperada:** el programa abre un **menú de selección interactivo**. Desde la opción
+*1. Registrar asignación* se ejecuta el CU-02 (elegir solicitud pendiente, vehículo, conductor y
+horas); el sistema valida las reglas de negocio y **solo entonces** persiste.
+
 ```
-A) Asignacion valida     -> OK -> asignacion #1 persistida (...)
-B) Rechazo por vehiculo  -> RECHAZADA (no se persiste): ... requiere mantenimiento preventivo ...
-C) Rechazo por conductor -> RECHAZADA (no se persiste): ... excede el limite legal de horas ...
+---------------- MENU PRINCIPAL ----------------
+ 1. Registrar asignacion (validar y persistir) [CU-02]
+ 2. Listar solicitudes pendientes
+ 3. Listar vehiculos ordenados por capacidad
+ 4. Listar conductores
+ 5. Buscar vehiculo por patente
+ 6. Buscar conductor por nombre
+ 0. Salir
+------------------------------------------------
+```
+
+Ejemplos de resultado de la opción 1:
+```
+OK -> asignacion #2 confirmada y persistida (vehiculo AA123BB, conductor Ana Gomez).
+RECHAZADA (no se persiste): Vehiculo CC456DD requiere mantenimiento preventivo (umbral de km superado).
 ```
 
 ## 9. Scripts SQL
@@ -171,10 +190,12 @@ scgl-prototipo-asignacion/
 ├── db/
 │   ├── schema.sql · datos.sql · consultas.sql · borrado.sql
 └── src/main/java/com/logisticaandina/scgl/
-    ├── App.java
+    ├── App.java                  # punto de entrada: inicia MenuConsola
+    ├── MenuConsola.java          # menú de selección interactivo (TP3)
     ├── dominio/                  # Vehiculo(+subclases), Conductor, Licencia, SolicitudEnvio, Asignacion, enums
     ├── servicio/                 # MotorAsignacion
-    ├── persistencia/             # ConexionMySQL, *DAO
+    ├── persistencia/             # ConexionMySQL, *DAO (buscarPorId + listados de solo lectura)
+    ├── util/                     # Algoritmos (ordenación y búsqueda a mano)
     └── excepciones/              # AsignacionInvalidaException (+derivadas), PersistenciaException
 ```
 
@@ -193,7 +214,7 @@ scgl-prototipo-asignacion/
 |----|------|---------|--------|
 | TP1 | Análisis, diseño y prototipo del módulo de asignación | — | ✅ |
 | TP2 | Flujos del PUD, modelo de datos, SQL y comunicaciones | — | ✅ |
-| TP3 | Codificación POO: menú interactivo, pilares, excepciones | 2026-10-19 | ⏳ pendiente |
+| TP3 | Codificación POO: menú interactivo, pilares, excepciones | 2026-10-19 | 🟡 código listo |
 | TP4 | Versión integradora: patrón de diseño, CRUD, arreglos/`ArrayList`, archivos, video | 2026-11-09 | ⏳ pendiente |
 
 El detalle de lo pendiente (requerimientos, características exigidas y estado real del repo por
