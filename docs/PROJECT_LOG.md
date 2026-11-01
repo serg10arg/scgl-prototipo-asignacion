@@ -378,8 +378,15 @@ trabajo o de generar documentación, para no desalinear el informe del código r
     - Al final se recargaron `schema.sql` + `datos.sql` y se borró `reportes/`.
 - **Guion natural para el video:** rechazo RN4 de CC456DD → cerrar su orden preventiva →
   la misma asignación pasa a ser válida.
-- **Pendiente en esta fase:** informe `CABRERA-SERGIO-AP4` (con diagramas PlantUML de clases
-  del paquete MVC y de secuencia del cierre de orden) y video.
+- **Informe AP4 (borrador, 2026-11-01):** `CABRERA-SERGIO-AP4.docx` (11 páginas): correcciones
+  (DER, Figura 1), selección del patrón MVC (elementos del patrón + RNF-10), explicación clase por
+  clase (Figura 2 clases; Figura 3 secuencia del cierre de orden), características de la consigna
+  (5.1–5.5 + tabla resumen), evidencia de ejecución (secuencia a–i), video, repositorio y
+  trazabilidad. Fuentes de los diagramas en `docs/diagramas/*.puml` (PlantUML).
+    - **Nuevo requerimiento:** RNF-10 «aplicar MVC con acceso a datos por DAO para las órdenes de
+      mantenimiento» (registra la decisión de diseño, como el ejemplo del material M4L4).
+- **Pendiente en esta fase:** revisión del informe por Sergio, enlace al video y exportación
+  a PDF desde Word; grabar el video.
 
 ---
 
