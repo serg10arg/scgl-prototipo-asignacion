@@ -4,7 +4,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8-blue)
 ![Build](https://img.shields.io/badge/Maven-3.9%2B-C71A36)
 ![Metodología](https://img.shields.io/badge/Metodolog%C3%ADa-PUD-2E6E5E)
-![Estado](https://img.shields.io/badge/Estado-C%C3%B3digo%20TP3%20listo-brightgreen)
+![Estado](https://img.shields.io/badge/Estado-TP3%20aprobado%20%C2%B7%20TP4%20en%20curso-brightgreen)
 
 > Prototipo operacional del **Sistema Centralizado de Gestión Logística y Mantenimiento de
 > Flotas (SCGL-Backend)** de *Logística Andina S.R.L.*, desarrollado en **Java (orientado a
@@ -184,11 +184,12 @@ scgl-prototipo-asignacion/
 ├── pom.xml
 ├── README.md
 ├── SECCION-PROTOTIPO.md
-├── config.properties.example
 ├── docs/
 │   └── PROJECT_LOG.md            # bitácora del proyecto (fuente de verdad del estado)
 ├── db/
 │   ├── schema.sql · datos.sql · consultas.sql · borrado.sql
+├── src/main/resources/
+│   └── config.properties.example # plantilla de conexión (credenciales fuera del repo)
 └── src/main/java/com/logisticaandina/scgl/
     ├── App.java                  # punto de entrada: inicia MenuConsola
     ├── MenuConsola.java          # menú de selección interactivo (TP3)
@@ -202,10 +203,10 @@ scgl-prototipo-asignacion/
 ## 11. Documentación
 
 - **[`docs/PROJECT_LOG.md`](docs/PROJECT_LOG.md)** — bitácora viva del proyecto: qué se
-  construyó en cada fase (TP1/TP2), decisiones, y lo pendiente de TP3/TP4. **Leer antes de
+  construyó en cada fase (TP1 a TP3), decisiones, y lo pendiente del TP4. **Leer antes de
   retomar el trabajo.**
 - **[`SECCION-PROTOTIPO.md`](SECCION-PROTOTIPO.md)** — detalle de la sección prototipo.
-- **Informe del TP** (`CABRERA-SERGIO-AP2`, entregado en la plataforma) — análisis, diseño,
+- **Informes de los TP** (`CABRERA-SERGIO-AP1` a `AP3`, entregados en la plataforma) — análisis, diseño,
   implementación, pruebas, DER, DDL/DML y comunicaciones, con la trazabilidad completa.
 
 ## 12. Hoja de ruta (incremental)
@@ -214,8 +215,8 @@ scgl-prototipo-asignacion/
 |----|------|---------|--------|
 | TP1 | Análisis, diseño y prototipo del módulo de asignación | — | ✅ |
 | TP2 | Flujos del PUD, modelo de datos, SQL y comunicaciones | — | ✅ |
-| TP3 | Codificación POO: menú interactivo, pilares, excepciones | 2026-10-19 | 🟡 código listo |
-| TP4 | Versión integradora: patrón de diseño, CRUD, arreglos/`ArrayList`, archivos, video | 2026-11-09 | ⏳ pendiente |
+| TP3 | Codificación POO: menú interactivo, pilares, excepciones | 2026-10-19 | ✅ |
+| TP4 | Versión integradora: patrón de diseño, CRUD, arreglos/`ArrayList`, archivos, video | 2026-11-09 | 🟡 en curso |
 
 El detalle de lo pendiente (requerimientos, características exigidas y estado real del repo por
 cada TP) está en [`docs/PROJECT_LOG.md`](docs/PROJECT_LOG.md).
