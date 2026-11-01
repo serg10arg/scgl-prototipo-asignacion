@@ -27,7 +27,7 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 | Modelo de dominio (jerarquía Vehiculo, Conductor/Licencia, SolicitudEnvio, Asignacion) | ✅ |
 | Reglas de negocio RN1–RN5 en `MotorAsignacion` (validación antes de persistir) | ✅ |
 | Persistencia JDBC + transacción atómica (`AsignacionDAO.guardarEnTransaccion`) | ✅ |
-| Base de datos: 5 tablas InnoDB + 4 FK (`db/schema.sql`) | ✅ |
+| Base de datos: 6 tablas InnoDB + 5 FK (`db/schema.sql`; `licencia` separada en TP4) | ✅ (Fase 8) |
 | Scripts SQL de inserción / consulta / borrado (`db/datos.sql`, `consultas.sql`, `borrado.sql`) | ✅ (Fase 4) |
 | CU-02 «Asignar viaje» de punta a punta (desde el menú interactivo) | ✅ (Fase 6) |
 | Documento TP3 (`CABRERA-SERGIO-AP3`) entregado — **100/100** | ✅ (Fase 7) |
@@ -303,6 +303,38 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 
 ---
 
+## Fase 8 · TP4 · Versión final integradora
+
+- **Estado:** 🟡 en curso (2026-11 · TP4 · entrega 2026-11-09)
+- **Decisiones de alcance (2026-11-01):**
+    - **Patrón de diseño seleccionado: MVC** (el que desarrolla el material M4L4), aplicado al
+      módulo de mantenimiento (CU-06 / RF-09); el **Modelo** persiste a través del DAO ya
+      definido en la arquitectura (coherencia con TP1/TP2). Reemplaza la idea previa
+      «DAO + Factory».
+    - **CRUD de órdenes de mantenimiento** con alta, consulta y actualización; la **baja es
+      lógica** (cerrar la orden, sin `DELETE`), coherente con las FK `RESTRICT` y la
+      trazabilidad del historial (RF-10).
+    - **Corrección de la observación del TP2 (normalización del DER):** la licencia pasa a su
+      propia tabla.
+- **C1 · Licencia en tabla propia (2026-11-01):**
+    - `db/schema.sql`: `conductor` queda con `id_conductor`, `nombre`, `horas_acumuladas`; nueva
+      tabla `licencia` (`id_licencia`, `id_conductor` UNIQUE + `fk_lic_conductor`, `numero`
+      UNIQUE, `tipo`, `fecha_vencimiento`). Relación **1:1**; la licencia depende
+      existencialmente del conductor y corresponde al objeto de valor `Licencia` del dominio.
+    - `db/datos.sql`: conductores y licencias en inserts separados (mismos valores).
+    - `ConductorDAO`: `SELECT_BASE` con `JOIN licencia`; `mapear` lee `numero`, `tipo`,
+      `fecha_vencimiento`. El dominio (`Conductor`, `Licencia`) **no cambia**.
+    - `db/consultas.sql`: consulta 6 (conductores y vigencia de su licencia, RN3).
+      `db/borrado.sql`: evidencia de `RESTRICT` sobre `fk_lic_conductor` (ERROR 1451).
+    - **Verificación:** scripts cargados en MariaDB local: 6 tablas, 5 FK; `DELETE` de un
+      conductor con licencia → ERROR 1451. Menú: opción 4 lista conductores con su licencia;
+      opción 1 rechaza por RN4 (CC456DD) y confirma la asignación #2 (AA123BB + Ana Gomez).
+- **Pendiente en esta fase:** C2 dominio `OrdenMantenimiento` + interfaz `CrudDAO<T>` +
+  `OrdenMantenimientoDAO`; C3 MVC de mantenimiento (opción 7 del menú); C4 arreglo +
+  `ArrayList` (resumen de flota); C5 archivos (exportar/recuperar CSV); informe AP4; video.
+
+---
+
 ## Pendiente — TP3 y TP4 (consignas de la cátedra)
 
 > Estas dos secciones **sí** son las consignas de la materia (TP3 y TP4), incrementales
@@ -374,9 +406,10 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 - **Colecciones (`ArrayList`/arreglos)** en la capa de aplicación: `List`/`ArrayList` ya se
   usan en los listados y en `MenuConsola` (Fase 6); falta sumar arreglos → **TP4**.
 - **Archivos** (persistencia complementaria, opcional) → **TP4**.
-- **`OrdenMantenimiento` sin clase de dominio** (solo existe la tabla): conviene sumarla al
-  ampliar la cobertura (TP3/TP4).
-- **Afinar la normalización del DER** (observación menor del docente en TP2, sin impacto de
+- **`OrdenMantenimiento` sin clase de dominio** (solo existe la tabla): se suma en TP4
+  (Fase 8, C2).
+- ~~**Afinar la normalización del DER**~~ → **resuelto en TP4 (Fase 8, C1)**: licencia en
+  tabla propia. Texto original: (observación menor del docente en TP2, sin impacto de
   performance a este volumen): a confirmar el detalle con el docente. Candidatos probables:
   llevar catálogos/estados a tablas de referencia en lugar de ENUM, o separar la licencia del
   conductor en su propia tabla. Se complementa en TP3/TP4; no exige reentrega del TP2.
