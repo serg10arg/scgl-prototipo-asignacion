@@ -52,8 +52,8 @@ el **módulo de asignación de viajes (CU-02)**, el de mayor riesgo y valor del 
 | Elemento | Estado en el prototipo |
 |----------|------------------------|
 | Módulo de asignación (CU-02: emparejar solicitud–vehículo–conductor con validaciones) | ✅ implementado |
-| Modelo de datos completo (5 tablas, InnoDB) | ✅ creado |
-| Módulo de mantenimiento (CU-06 / RF-09) | 🟡 modelado y con tabla; clase Java pendiente |
+| Modelo de datos completo (6 tablas, InnoDB) | ✅ creado |
+| Módulo de mantenimiento (CU-06 / RF-09): alta, consulta, modificación y baja lógica de órdenes, con patrón MVC | ✅ implementado (TP4) |
 | Cierre de viaje, alertas, consultas/indicadores desde la app (RF-07/08/10/11) | ⛔ pendiente |
 
 > El **modelo de análisis y de clases es integral** (describe todo el sistema); el prototipo
@@ -83,8 +83,11 @@ Diseño por capas, con las reglas de negocio **encapsuladas** en el dominio:
   `Conductor`, `Licencia`, `SolicitudEnvio`, `Asignacion` y las enumeraciones de estado.
 - **`servicio/`** — `MotorAsignacion` (CU-02): valida en orden (RN1 → RN4 → RN5 → RN3 → RN2) y,
   si corresponde, delega la persistencia.
-- **`persistencia/`** — **JDBC puro**: `ConexionMySQL` y los DAO. La transacción atómica vive
-  en `AsignacionDAO.guardarEnTransaccion()`.
+- **`persistencia/`** — **JDBC puro**: `ConexionMySQL`, las interfaces `ConsultaDAO<T>` /
+  `CrudDAO<T>` y los DAO. Las transacciones atómicas viven en `AsignacionDAO` y
+  `OrdenMantenimientoDAO`. `ArchivoOrdenes` exporta y recupera las órdenes en CSV (`java.io`).
+- **`mantenimiento/`** — Módulo de mantenimiento (CU-06) con **patrón MVC**:
+  `ModeloMantenimiento`, `VistaMantenimiento` y `ControladorMantenimiento` (TP4).
 - **`excepciones/`** — Jerarquía de excepciones de validación (`AsignacionInvalidaException` y
   derivadas) y de persistencia (`PersistenciaException`).
 - **`util/`** — `Algoritmos`: ordenación (selección, inserción) y búsqueda (binaria, lineal)
@@ -95,8 +98,8 @@ Diseño por capas, con las reglas de negocio **encapsuladas** en el dominio:
 
 ## 5. Modelo de datos y reglas de negocio
 
-Base **`scgl`** (MySQL / InnoDB), en tercera forma normal, con 5 tablas:
-`conductor`, `vehiculo`, `solicitud_envio`, `asignacion` y `orden_mantenimiento`.
+Base **`scgl`** (MySQL / InnoDB), en tercera forma normal, con 6 tablas:
+`conductor`, `licencia`, `vehiculo`, `solicitud_envio`, `asignacion` y `orden_mantenimiento`.
 La herencia de vehículos se mapea con **tabla única + discriminador** (`vehiculo.tipo`).
 
 Reglas de negocio principales (etiquetadas en el código y en el modelo):
@@ -156,6 +159,7 @@ horas); el sistema valida las reglas de negocio y **solo entonces** persiste.
  4. Listar conductores
  5. Buscar vehiculo por patente
  6. Buscar conductor por nombre
+ 7. Mantenimiento de flota (ordenes, resumen, CSV) [CU-06]
  0. Salir
 ------------------------------------------------
 ```
@@ -172,7 +176,7 @@ Ubicados en `db/`, uno por operación (coherente con los entregables del TP2):
 
 | Script | Contenido |
 |--------|-----------|
-| `db/schema.sql` | Creación de la base y las 5 tablas (DDL). |
+| `db/schema.sql` | Creación de la base y las 6 tablas (DDL). |
 | `db/datos.sql` | Datos de demostración (inserción). |
 | `db/consultas.sql` | Consultas de explotación (historial, pendientes, mantenimiento, indicadores). |
 | `db/borrado.sql` | Borrado de registros y verificación de integridad referencial. |
@@ -192,12 +196,13 @@ scgl-prototipo-asignacion/
 │   └── config.properties.example # plantilla de conexión (credenciales fuera del repo)
 └── src/main/java/com/logisticaandina/scgl/
     ├── App.java                  # punto de entrada: inicia MenuConsola
-    ├── MenuConsola.java          # menú de selección interactivo (TP3)
+    ├── MenuConsola.java          # menú de selección interactivo (TP3; opción 7 en TP4)
     ├── dominio/                  # Vehiculo(+subclases), Conductor, Licencia, SolicitudEnvio, Asignacion, enums
     ├── servicio/                 # MotorAsignacion
-    ├── persistencia/             # ConexionMySQL, *DAO (buscarPorId + listados de solo lectura)
+    ├── persistencia/             # ConexionMySQL, ConsultaDAO/CrudDAO, *DAO, ArchivoOrdenes (CSV)
+    ├── mantenimiento/            # patrón MVC: Modelo, Vista y Controlador del CU-06 (TP4)
     ├── util/                     # Algoritmos (ordenación y búsqueda a mano)
-    └── excepciones/              # AsignacionInvalidaException (+derivadas), PersistenciaException
+    └── excepciones/              # AsignacionInvalidaException (+derivadas), MantenimientoInvalidoException, PersistenciaException
 ```
 
 ## 11. Documentación

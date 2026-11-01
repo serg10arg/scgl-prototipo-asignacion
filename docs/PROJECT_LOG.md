@@ -34,7 +34,10 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 | Menú de selección interactivo por consola (`MenuConsola`) | ✅ (Fase 6) |
 | Ordenación y búsqueda a mano (`util/Algoritmos`) | ✅ (Fase 6) |
 | Cierre de viaje + alerta de mantenimiento (RF-07/RF-08) | ⛔ pendiente |
-| Módulo de mantenimiento en código (RF-09) — hoy solo existe la tabla | ⛔ pendiente |
+| Módulo de mantenimiento en código (RF-09 / CU-06) con patrón MVC: alta, consulta, modificación y baja lógica | ✅ (Fase 8) |
+| Interfaces `ConsultaDAO<T>` / `CrudDAO<T>` en la capa de persistencia | ✅ (Fase 8) |
+| Arreglo + `ArrayList` (resumen de flota, registros del CSV) | ✅ (Fase 8) |
+| Archivos: exportar/recuperar órdenes en CSV (`java.io`) | ✅ (Fase 8) |
 | Consultas/indicadores desde la app (RF-10/RF-11) | ⛔ pendiente |
 | Pruebas automatizadas (JUnit) — los CP del informe son especificaciones | ⛔ pendiente |
 
@@ -329,9 +332,54 @@ trabajo o de generar documentación, para no desalinear el informe del código r
     - **Verificación:** scripts cargados en MariaDB local: 6 tablas, 5 FK; `DELETE` de un
       conductor con licencia → ERROR 1451. Menú: opción 4 lista conductores con su licencia;
       opción 1 rechaza por RN4 (CC456DD) y confirma la asignación #2 (AA123BB + Ana Gomez).
-- **Pendiente en esta fase:** C2 dominio `OrdenMantenimiento` + interfaz `CrudDAO<T>` +
-  `OrdenMantenimientoDAO`; C3 MVC de mantenimiento (opción 7 del menú); C4 arreglo +
-  `ArrayList` (resumen de flota); C5 archivos (exportar/recuperar CSV); informe AP4; video.
+- **C2 a C5 · Módulo de mantenimiento (2026-11-01):**
+    - **Mejora de excepciones:** `PersistenciaException.getDetalle()` agrega la causa técnica
+      (mensaje de MySQL) al texto de negocio; `MenuConsola` y el controlador lo usan. Surgió al
+      verificar C1 (un «Error al listar conductores» ocultaba que faltaba recargar la base).
+    - **Dominio:** `OrdenMantenimiento` (id, idVehiculo, patenteVehiculo, tipo, estado, fecha)
+      con `cambiarTipo()`, `cerrar()` y `actualizaKmDeReferencia()`; enums `TipoOrden`
+      (PREVENTIVO/CORRECTIVO) y `EstadoOrden` (ABIERTA/CERRADA);
+      `MantenimientoInvalidoException` para los rechazos de negocio del módulo.
+    - **Interfaces:** `ConsultaDAO<T>` (`buscarPorId`, `listarTodos`) y `CrudDAO<T> extends
+      ConsultaDAO<T>` (`insertar`, `actualizar`; sin borrado físico a propósito: baja lógica).
+      `VehiculoDAO` y `ConductorDAO` implementan `ConsultaDAO`; `OrdenMantenimientoDAO`,
+      `CrudDAO`.
+    - **`OrdenMantenimientoDAO`:** consulta (`buscarPorId`, `listarTodos`, `listarAbiertas`,
+      con JOIN a `vehiculo` para la patente); **alta** transaccional (INSERT de la orden +
+      vehículo a `EN_TALLER`, CU-06 paso 5); **modificación** del tipo de una orden abierta;
+      **baja lógica** `cerrarEnTransaccion` (orden `CERRADA` + vehículo `OPERATIVO` y, si es
+      preventiva, `km_ultimo_mantenimiento = km_actual`, CU-06 E1 «si corresponde», RN4).
+    - **Archivos:** `persistencia/ArchivoOrdenes` exporta a `reportes/ordenes_mantenimiento.csv`
+      (separador `;`, `File` + `FileOutputStream` + `PrintStream`) y lo recupera
+      (`FileInputStream` + `BufferedReader`) como `ArrayList<String[]>`; valida el formato de
+      cada línea. `reportes/` queda en `.gitignore`.
+    - **Patrón MVC** (paquete `mantenimiento`): `ModeloMantenimiento` (reglas + acceso a DAO y
+      archivo; depende de `ConsultaDAO<Vehiculo>`), `VistaMantenimiento` (solo consola; recibe
+      el `Scanner` del menú para no abrir un segundo lector de `System.in`) y
+      `ControladorMantenimiento` (submenú de 8 opciones; captura
+      `MantenimientoInvalidoException`, `PersistenciaException` e `IOException`).
+    - **Arreglo + `ArrayList`:** `ModeloMantenimiento.resumenFlota()` recorre el `ArrayList` de
+      vehículos y acumula en un `int[]` indexado por `EstadoVehiculo.ordinal()` (+1 posición
+      para los que superan el umbral, RN4); el CSV usa `String[]` por registro dentro de un
+      `ArrayList` y un arreglo fijo de encabezado.
+    - **Menú:** opción **7** «Mantenimiento de flota (órdenes, resumen, CSV) [CU-06]».
+- **Verificación (MariaDB local, `javac` + driver MariaDB; cada commit compila por separado):**
+    - Recuperar CSV sin exportar → «No existe ...; exporte primero» (sin cortar el programa).
+    - Resumen inicial: 2 OPERATIVO, 1 con umbral superado.
+    - Abrir orden sobre CC456DD → **rechazo** (ya tiene la #1 abierta). Abrir CORRECTIVO sobre
+      AA123BB → orden #2, AA123BB `EN_TALLER`. Modificar #2 → PREVENTIVO.
+    - Cerrar #1 → CC456DD `OPERATIVO` y `km_ultimo_mantenimiento` 140000 → 152000. Cerrar #1 otra
+      vez → **rechazo**.
+    - Exportar → 2 filas; recuperar → las 2 filas desde el archivo.
+    - **Integración con CU-02:** solicitud 2 con AA123BB → rechazo RN1 (`EN_TALLER`); con
+      CC456DD (ya sin mantenimiento pendiente) → asignación #2 confirmada.
+    - Con la tabla `licencia` renombrada, la opción 4 muestra «... (causa: Table
+      'scgl.licencia' doesn't exist)».
+    - Al final se recargaron `schema.sql` + `datos.sql` y se borró `reportes/`.
+- **Guion natural para el video:** rechazo RN4 de CC456DD → cerrar su orden preventiva →
+  la misma asignación pasa a ser válida.
+- **Pendiente en esta fase:** informe `CABRERA-SERGIO-AP4` (con diagramas PlantUML de clases
+  del paquete MVC y de secuencia del cierre de orden) y video.
 
 ---
 
