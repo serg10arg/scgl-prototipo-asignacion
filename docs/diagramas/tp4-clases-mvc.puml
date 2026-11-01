@@ -1,0 +1,114 @@
+@startuml tp4-clases-mvc
+' Diagrama de clases del modulo de mantenimiento (patron MVC) - TP4
+skinparam defaultFontName Carlito
+skinparam defaultFontSize 15
+skinparam nodesep 25
+skinparam ranksep 40
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #1F3864
+}
+skinparam package {
+  BorderColor #1F3864
+}
+
+package "mantenimiento (MVC)" #F3F7FB {
+  class ControladorMantenimiento <<Controlador>> {
+    - modelo : ModeloMantenimiento
+    - vista : VistaMantenimiento
+    + ejecutar() : void
+    - abrirOrden() : void
+    - modificarTipo() : void
+    - cerrarOrden() : void
+    - exportar() : void
+  }
+  class ModeloMantenimiento <<Modelo>> {
+    - ordenDAO : OrdenMantenimientoDAO
+    - vehiculoDAO : ConsultaDAO<Vehiculo>
+    - archivo : ArchivoOrdenes
+    + listarOrdenes() : List<OrdenMantenimiento>
+    + listarOrdenesAbiertas() : List<OrdenMantenimiento>
+    + abrirOrden(idVehiculo, tipo) : OrdenMantenimiento
+    + modificarTipo(idOrden, tipo) : OrdenMantenimiento
+    + cerrarOrden(idOrden) : OrdenMantenimiento
+    + resumenFlota() : int[]
+    + exportarOrdenes() : int
+    + recuperarOrdenesExportadas() : List<String[]>
+  }
+  class VistaMantenimiento <<Vista>> {
+    - sc : Scanner
+    + mostrarMenu() : void
+    + solicitarOpcion() : int
+    + solicitarIdVehiculo() : int
+    + solicitarIdOrden() : int
+    + solicitarTipo() : TipoOrden
+    + mostrarOrdenes(titulo, ordenes) : void
+    + mostrarResumen(conteo : int[]) : void
+    + mostrarRegistrosArchivo(ruta, encabezado, registros) : void
+    + mostrarMensaje(texto) : void
+    + mostrarError(texto) : void
+  }
+}
+
+package "persistencia" #F7F7F7 {
+  interface "ConsultaDAO<T>" as ConsultaDAO {
+    + buscarPorId(id : int) : T
+    + listarTodos() : List<T>
+  }
+  interface "CrudDAO<T>" as CrudDAO {
+    + insertar(entidad : T) : int
+    + actualizar(entidad : T) : void
+  }
+  class OrdenMantenimientoDAO {
+    + listarAbiertas() : List<OrdenMantenimiento>
+    + cerrarEnTransaccion(o : OrdenMantenimiento) : void
+  }
+  class VehiculoDAO
+  class ConductorDAO
+  class ArchivoOrdenes {
+    - ENCABEZADO : String[]
+    + exportar(ordenes) : int
+    + recuperar() : List<String[]>
+  }
+}
+
+package "dominio" #F7F7F7 {
+  class OrdenMantenimiento {
+    - id : int
+    - idVehiculo : int
+    - patenteVehiculo : String
+    - tipo : TipoOrden
+    - estado : EstadoOrden
+    - fecha : LocalDate
+    + estaAbierta() : boolean
+    + cambiarTipo(t : TipoOrden) : void
+    + cerrar() : void
+    + actualizaKmDeReferencia() : boolean
+  }
+  enum TipoOrden {
+    PREVENTIVO
+    CORRECTIVO
+  }
+  enum EstadoOrden {
+    ABIERTA
+    CERRADA
+  }
+}
+
+ControladorMantenimiento --> ModeloMantenimiento
+ControladorMantenimiento --> VistaMantenimiento
+ModeloMantenimiento --> OrdenMantenimientoDAO
+ModeloMantenimiento --> ConsultaDAO
+ModeloMantenimiento --> ArchivoOrdenes
+CrudDAO -up-|> ConsultaDAO
+OrdenMantenimientoDAO ..|> CrudDAO
+VehiculoDAO ..|> ConsultaDAO
+ConductorDAO ..|> ConsultaDAO
+OrdenMantenimientoDAO ..> OrdenMantenimiento
+ArchivoOrdenes ..> OrdenMantenimiento
+OrdenMantenimiento --> TipoOrden
+OrdenMantenimiento --> EstadoOrden
+@enduml

@@ -1,0 +1,51 @@
+@startuml tp4-secuencia-cerrar-orden
+' Secuencia del cierre de una orden de mantenimiento (baja logica, CU-06 E1) - TP4
+skinparam defaultFontName Carlito
+skinparam defaultFontSize 14
+skinparam sequenceMessageAlign left
+skinparam sequence {
+  ParticipantBorderColor #1F3864
+  ParticipantBackgroundColor #FFFFFF
+  LifeLineBorderColor #7F7F7F
+}
+autonumber
+hide footbox
+
+actor "Encargado\nde Taller" as U
+participant "Vista\nMantenimiento" as V
+participant "Controlador\nMantenimiento" as C
+participant "Modelo\nMantenimiento" as M
+participant "OrdenMantenimiento\nDAO" as D
+participant "o :\nOrdenMantenimiento" as O
+database "MySQL\n(scgl)" as DB
+
+U -> V : opcion 5 (cerrar orden)
+C -> M : listarOrdenesAbiertas()
+M -> D : listarAbiertas()
+D -> DB : SELECT ... JOIN\nvehiculo WHERE\nestado = 'ABIERTA'
+C -> V : mostrarOrdenes(...)
+C -> V : solicitarIdOrden()
+U -> V : id de la orden
+C -> M : cerrarOrden(idOrden)
+M -> D : buscarPorId(idOrden)
+D -> DB : SELECT ... WHERE id_orden = ?
+D --> M : o
+alt la orden no existe o ya esta cerrada
+  M --> C : Mantenimiento\nInvalidoException
+  C -> V : mostrarError(\n"RECHAZADA (no se persiste)...")
+else orden abierta
+  M -> O : cerrar()
+  M -> D : cerrarEnTransaccion(o)
+  D -> DB : setAutoCommit(false)
+  D -> DB : UPDATE orden_mantenimiento\nSET estado = 'CERRADA'
+  D -> DB : UPDATE vehiculo\nSET estado = 'OPERATIVO'\n[preventivo:\nkm_ultimo_mantenimiento =\nkm_actual]
+  alt sin errores
+    D -> DB : commit()
+    C -> V : mostrarMensaje(\n"OK -> orden cerrada...")
+  else SQLException
+    D -> DB : rollback()
+    D --> C : PersistenciaException\n(propagada por el Modelo)
+    C -> V : mostrarError(e.getDetalle())
+  end
+end
+@enduml

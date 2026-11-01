@@ -1,0 +1,76 @@
+@startuml tp4-der
+' DER del SCGL actualizado en el TP4 (licencia en tabla propia)
+hide circle
+skinparam linetype ortho
+skinparam defaultFontName Carlito
+skinparam defaultFontSize 14
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #1F3864
+}
+
+entity "conductor" as conductor {
+  * id_conductor : INT <<PK>>
+  --
+  nombre : VARCHAR(120)
+  horas_acumuladas : DECIMAL(5,2)
+}
+
+entity "licencia" as licencia #EAF3E6 {
+  * id_licencia : INT <<PK>>
+  --
+  id_conductor : INT <<FK, UNIQUE>>
+  numero : VARCHAR(40) <<UNIQUE>>
+  tipo : VARCHAR(10)
+  fecha_vencimiento : DATE
+}
+
+entity "vehiculo" as vehiculo {
+  * id_vehiculo : INT <<PK>>
+  --
+  patente : VARCHAR(15) <<UNIQUE>>
+  tipo : ENUM(PESADO, LIGERO)
+  capacidad_kg : DECIMAL(10,2)
+  km_actual : INT
+  km_ultimo_mantenimiento : INT
+  umbral_mantenimiento_km : INT
+  estado : ENUM(OPERATIVO, EN_TALLER, MANT_PENDIENTE)
+}
+
+entity "solicitud_envio" as solicitud {
+  * id_solicitud : INT <<PK>>
+  --
+  origen : VARCHAR(120)
+  destino : VARCHAR(120)
+  peso_kg : DECIMAL(10,2)
+  ventana_inicio : DATETIME
+  ventana_fin : DATETIME
+  estado : ENUM(PENDIENTE, ASIGNADA, CERRADA)
+}
+
+entity "asignacion" as asignacion {
+  * id_asignacion : INT <<PK>>
+  --
+  id_solicitud : INT <<FK>>
+  id_vehiculo : INT <<FK>>
+  id_conductor : INT <<FK>>
+  fecha_hora : DATETIME
+  horas_estimadas : DECIMAL(5,2)
+  estado : ENUM(CONFIRMADA, CERRADA)
+}
+
+entity "orden_mantenimiento" as orden {
+  * id_orden : INT <<PK>>
+  --
+  id_vehiculo : INT <<FK>>
+  tipo : ENUM(PREVENTIVO, CORRECTIVO)
+  estado : ENUM(ABIERTA, CERRADA)
+  fecha : DATE
+}
+
+conductor ||--|| licencia : fk_lic_conductor
+conductor ||--o{ asignacion : fk_asig_conductor
+vehiculo ||--o{ asignacion : fk_asig_vehiculo
+solicitud ||--o| asignacion : fk_asig_solicitud
+vehiculo ||--o{ orden : fk_om_vehiculo
+@enduml
