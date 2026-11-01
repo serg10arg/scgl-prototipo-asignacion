@@ -2,6 +2,9 @@ package com.logisticaandina.scgl;
 
 import com.logisticaandina.scgl.dominio.*;
 import com.logisticaandina.scgl.excepciones.*;
+import com.logisticaandina.scgl.mantenimiento.ControladorMantenimiento;
+import com.logisticaandina.scgl.mantenimiento.ModeloMantenimiento;
+import com.logisticaandina.scgl.mantenimiento.VistaMantenimiento;
 import com.logisticaandina.scgl.persistencia.*;
 import com.logisticaandina.scgl.servicio.MotorAsignacion;
 import com.logisticaandina.scgl.util.Algoritmos;
@@ -12,7 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
- * Menu de seleccion interactivo del prototipo SCGL (TP3).
+ * Menu de seleccion interactivo del prototipo SCGL (TP3; opcion 7 agregada en TP4).
  * Reemplaza la demo de 3 escenarios fijos por un programa dirigido por el usuario:
  * registra asignaciones (CU-02) validando las reglas de negocio antes de persistir,
  * y ofrece listados y busquedas de solo lectura sobre el modelo.
@@ -31,6 +34,7 @@ public class MenuConsola {
     private final ConductorDAO conductorDAO;
     private final SolicitudDAO solicitudDAO;
     private final MotorAsignacion motor;
+    private final ControladorMantenimiento mantenimiento;
 
     public MenuConsola() {
         this.sc = new Scanner(System.in);
@@ -38,6 +42,10 @@ public class MenuConsola {
         this.conductorDAO = new ConductorDAO();
         this.solicitudDAO = new SolicitudDAO();
         this.motor = new MotorAsignacion(new AsignacionDAO());
+        // Modulo de mantenimiento con patron MVC (TP4): comparte el Scanner del menu.
+        this.mantenimiento = new ControladorMantenimiento(
+                new ModeloMantenimiento(new OrdenMantenimientoDAO(), vehiculoDAO, new ArchivoOrdenes()),
+                new VistaMantenimiento(sc));
     }
 
     /** Bucle principal del menu (estructura repetitiva + seleccion). */
@@ -55,6 +63,7 @@ public class MenuConsola {
                     case 4 -> listarConductores();
                     case 5 -> buscarVehiculoPorPatente();
                     case 6 -> buscarConductorPorNombre();
+                    case 7 -> mantenimiento.ejecutar();
                     case 0 -> salir = true;
                     default -> System.out.println("  Opcion invalida. Intente nuevamente.");
                 }
@@ -75,6 +84,7 @@ public class MenuConsola {
         System.out.println(" 4. Listar conductores");
         System.out.println(" 5. Buscar vehiculo por patente");
         System.out.println(" 6. Buscar conductor por nombre");
+        System.out.println(" 7. Mantenimiento de flota (ordenes, resumen, CSV) [CU-06]");
         System.out.println(" 0. Salir");
         System.out.println("------------------------------------------------");
     }
