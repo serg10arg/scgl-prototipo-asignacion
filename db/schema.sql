@@ -2,19 +2,32 @@ CREATE DATABASE IF NOT EXISTS scgl CHARACTER SET utf8mb4;
 USE scgl;
 
 DROP TABLE IF EXISTS asignacion;
+DROP TABLE IF EXISTS licencia;
 DROP TABLE IF EXISTS orden_mantenimiento;
 DROP TABLE IF EXISTS solicitud_envio;
 DROP TABLE IF EXISTS vehiculo;
 DROP TABLE IF EXISTS conductor;
 
 -- Conductores (RF2). horas_acumuladas es la base de la regla RN2.
+-- TP4: los datos de la licencia pasan a su propia tabla (normalizacion del DER,
+-- observacion del TP2); el conductor conserva solo sus atributos propios.
 CREATE TABLE conductor (
                            id_conductor        INT AUTO_INCREMENT PRIMARY KEY,
                            nombre              VARCHAR(120)  NOT NULL,
-                           num_licencia        VARCHAR(40)   NOT NULL UNIQUE,
-                           tipo_licencia       VARCHAR(10)   NOT NULL,          -- p.ej. 'E1' pesados
-                           fecha_venc_licencia DATE          NOT NULL,          -- RN3
                            horas_acumuladas    DECIMAL(5,2)  NOT NULL DEFAULT 0 -- RN2 (jornada semanal; limite 44 h - CCT cargas)
+) ENGINE=InnoDB;
+
+-- Licencias de conducir (RN3). Relacion 1:1 con conductor (UNIQUE en la FK):
+-- la licencia depende existencialmente del conductor y corresponde al objeto de
+-- valor Licencia del dominio.
+CREATE TABLE licencia (
+                          id_licencia       INT AUTO_INCREMENT PRIMARY KEY,
+                          id_conductor      INT          NOT NULL UNIQUE,
+                          numero            VARCHAR(40)  NOT NULL UNIQUE,
+                          tipo              VARCHAR(10)  NOT NULL,          -- p.ej. 'E1' pesados
+                          fecha_vencimiento DATE         NOT NULL,          -- RN3
+                          CONSTRAINT fk_lic_conductor FOREIGN KEY (id_conductor)
+                              REFERENCES conductor(id_conductor)
 ) ENGINE=InnoDB;
 
 -- Vehiculos (RF1). La columna 'tipo' actua como discriminador de herencia

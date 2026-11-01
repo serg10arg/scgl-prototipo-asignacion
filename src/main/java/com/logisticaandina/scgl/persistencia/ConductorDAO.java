@@ -12,11 +12,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Acceso a datos de Conductor. */
+/**
+ * Acceso a datos de Conductor. Desde el TP4 la licencia vive en su propia
+ * tabla (1:1); el DAO reconstruye el agregado Conductor + Licencia con un JOIN.
+ * Un conductor sin licencia registrada no se lista: no puede ser asignado (RN3).
+ */
 public class ConductorDAO {
 
+    private static final String SELECT_BASE =
+            "SELECT c.id_conductor, c.nombre, c.horas_acumuladas, "
+          + "l.numero, l.tipo, l.fecha_vencimiento "
+          + "FROM conductor c JOIN licencia l ON l.id_conductor = c.id_conductor";
+
     public Conductor buscarPorId(int id) throws PersistenciaException {
-        String sql = "SELECT * FROM conductor WHERE id_conductor = ?";
+        String sql = SELECT_BASE + " WHERE c.id_conductor = ?";
         try (Connection c = ConexionMySQL.obtener();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -30,7 +39,7 @@ public class ConductorDAO {
 
     /** Lista todos los conductores (solo lectura; menu interactivo del TP3). */
     public List<Conductor> listarTodos() throws PersistenciaException {
-        String sql = "SELECT * FROM conductor ORDER BY id_conductor";
+        String sql = SELECT_BASE + " ORDER BY c.id_conductor";
         List<Conductor> lista = new ArrayList<>();
         try (Connection c = ConexionMySQL.obtener();
              PreparedStatement ps = c.prepareStatement(sql);
@@ -46,9 +55,9 @@ public class ConductorDAO {
 
     private Conductor mapear(ResultSet rs) throws SQLException {
         Licencia lic = new Licencia(
-                rs.getString("num_licencia"),
-                rs.getString("tipo_licencia"),
-                rs.getObject("fecha_venc_licencia", LocalDate.class));
+                rs.getString("numero"),
+                rs.getString("tipo"),
+                rs.getObject("fecha_vencimiento", LocalDate.class));
         return new Conductor(
                 rs.getInt("id_conductor"),
                 rs.getString("nombre"),

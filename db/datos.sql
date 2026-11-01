@@ -5,9 +5,14 @@
 USE scgl;
 
 -- Conductores
-INSERT INTO conductor (nombre, num_licencia, tipo_licencia, fecha_venc_licencia, horas_acumuladas) VALUES
-    ('Ana Gomez',   'LIC-1001', 'E1', '2027-12-31', 20.00),  -- id 1: apto
-    ('Luis Pereyra','LIC-1002', 'E1', '2027-06-30', 40.00);  -- id 2: 40 h; +6 h supera el limite de 44 h (RN2)
+INSERT INTO conductor (nombre, horas_acumuladas) VALUES
+    ('Ana Gomez',    20.00),  -- id 1: apto
+    ('Luis Pereyra', 40.00);  -- id 2: 40 h; +6 h supera el limite de 44 h (RN2)
+
+-- Licencias (una por conductor, RN3)
+INSERT INTO licencia (id_conductor, numero, tipo, fecha_vencimiento) VALUES
+    (1, 'LIC-1001', 'E1', '2027-12-31'),
+    (2, 'LIC-1002', 'E1', '2027-06-30');
 
 -- Vehiculos
 INSERT INTO vehiculo (patente, tipo, capacidad_kg, km_actual, km_ultimo_mantenimiento, umbral_mantenimiento_km, estado) VALUES
