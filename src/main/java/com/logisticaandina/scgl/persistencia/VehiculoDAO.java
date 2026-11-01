@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Acceso a datos de Vehiculo. Reconstruye la subclass segun el discriminador 'tipo'. */
-public class VehiculoDAO {
+public class VehiculoDAO implements ConsultaDAO<Vehiculo> {
 
+    @Override
     public Vehiculo buscarPorId(int id) throws PersistenciaException {
         String sql = "SELECT * FROM vehiculo WHERE id_vehiculo = ?";
         try (Connection c = ConexionMySQL.obtener();
@@ -27,6 +28,7 @@ public class VehiculoDAO {
     }
 
     /** Lista todos los vehiculos (solo lectura; alimenta el menu interactivo del TP3). */
+    @Override
     public List<Vehiculo> listarTodos() throws PersistenciaException {
         String sql = "SELECT * FROM vehiculo ORDER BY id_vehiculo";
         List<Vehiculo> lista = new ArrayList<>();

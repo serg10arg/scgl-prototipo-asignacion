@@ -17,13 +17,14 @@ import java.util.List;
  * tabla (1:1); el DAO reconstruye el agregado Conductor + Licencia con un JOIN.
  * Un conductor sin licencia registrada no se lista: no puede ser asignado (RN3).
  */
-public class ConductorDAO {
+public class ConductorDAO implements ConsultaDAO<Conductor> {
 
     private static final String SELECT_BASE =
             "SELECT c.id_conductor, c.nombre, c.horas_acumuladas, "
           + "l.numero, l.tipo, l.fecha_vencimiento "
           + "FROM conductor c JOIN licencia l ON l.id_conductor = c.id_conductor";
 
+    @Override
     public Conductor buscarPorId(int id) throws PersistenciaException {
         String sql = SELECT_BASE + " WHERE c.id_conductor = ?";
         try (Connection c = ConexionMySQL.obtener();
@@ -38,6 +39,7 @@ public class ConductorDAO {
     }
 
     /** Lista todos los conductores (solo lectura; menu interactivo del TP3). */
+    @Override
     public List<Conductor> listarTodos() throws PersistenciaException {
         String sql = SELECT_BASE + " ORDER BY c.id_conductor";
         List<Conductor> lista = new ArrayList<>();
