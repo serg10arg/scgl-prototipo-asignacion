@@ -16,7 +16,7 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 - **Nomenclatura de artefactos** (para mantener trazabilidad con el informe): `RF-xx`
   (req. funcional), `RNF-xx` (req. no funcional), `RN-x` (regla de negocio), `CU-xx`
   (caso de uso), `CP-xx` (caso de prueba).
-- **Última actualización:** 2026-10-04.
+- **Última actualización:** 2026-11-01.
 
 ---
 
@@ -30,6 +30,7 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 | Base de datos: 5 tablas InnoDB + 4 FK (`db/schema.sql`) | ✅ |
 | Scripts SQL de inserción / consulta / borrado (`db/datos.sql`, `consultas.sql`, `borrado.sql`) | ✅ (Fase 4) |
 | CU-02 «Asignar viaje» de punta a punta (desde el menú interactivo) | ✅ (Fase 6) |
+| Documento TP3 (`CABRERA-SERGIO-AP3`) entregado — **100/100** | ✅ (Fase 7) |
 | Menú de selección interactivo por consola (`MenuConsola`) | ✅ (Fase 6) |
 | Ordenación y búsqueda a mano (`util/Algoritmos`) | ✅ (Fase 6) |
 | Cierre de viaje + alerta de mantenimiento (RF-07/RF-08) | ⛔ pendiente |
@@ -197,7 +198,7 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 
 ## Fase 6 · TP3 · Menú de selección interactivo
 
-- **Estado:** ✅ código integrado (2026-10-03 · TP3) — falta el documento/presentación del TP3
+- **Estado:** ✅ completada (2026-10-03 · TP3) — documento en la Fase 7
 - **Entregado:**
     - **`MenuConsola`** (paquete raíz): programa interactivo por consola con bucle `while` +
       `switch`. Opciones: 1) registrar asignación (CU-02: elige solicitud pendiente, vehículo,
@@ -267,15 +268,38 @@ trabajo o de generar documentación, para no desalinear el informe del código r
       prueba de escritura se hizo en una base temporal (`scgl_tzcheck`, ya eliminada).
     - Después se recargaron `schema.sql` + `datos.sql` en `scgl` para descartar la asignación
       guardada con la hora corrida y dejar la solicitud 2 PENDIENTE.
-- **Pendiente:** la captura de consola para el informe (evidencia de ejecución), hecha con
-  el código ya corregido y siguiendo el orden de la demo indicado arriba.
+- **Evidencia de ejecución:** las capturas de consola (asignación válida y rechazo por RN4)
+  se tomaron con el código ya corregido y siguiendo el orden de la demo; están en el informe
+  del TP3 (Fase 7).
 - **Commits (2026-10-03):** `feat(persistencia): listados de solo lectura en los DAO (listarTodos, listarPendientes)`,
   `feat(util): ordenamiento (seleccion, insercion) y busqueda (binaria, lineal) a mano`,
   `feat(app): menu de seleccion interactivo del prototipo (CU-02, listados y busquedas)`,
   `refactor(app): App delega la interaccion en MenuConsola`, más este registro en la bitácora.
   Ajustes (2026-10-04): `fix(app): salida prolija ante EOF y encabezado honesto en el listado de vehiculos`,
   `fix(persistencia): fechas con java.time en JDBC, sin conversion de zona horaria`.
-- **Siguiente:** documento y presentación del TP3 (`CABRERA-SERGIO-AP3`); luego TP4.
+- **Siguiente:** Fase 7 · Documentación del TP3.
+
+---
+
+## Fase 7 · Documentación del TP3
+
+- **Estado:** ✅ completada (2026-10 · TP3)
+- **Entregado:**
+    - **Informe TP3** (`CABRERA-SERGIO-AP3`, 6 páginas): introducción; explicación del
+      desarrollo en Java organizada **por característica de la consigna** (sintaxis y tipos,
+      objetos y constructores, encapsulamiento, herencia, polimorfismo, abstracción,
+      excepciones, menú de selección, estructuras de control, ordenación y búsqueda), cada una
+      con su fragmento de código real del repo; tabla resumen característica → archivo/método;
+      evidencia de ejecución (Figura 1: asignación válida #2; Figura 2: rechazo por RN4);
+      repositorio y commits; referencias APA.
+    - **README** actualizado al menú interactivo (`MenuConsola`, `util/Algoritmos`, salida
+      esperada).
+- **Decisiones y hallazgos:**
+    - El informe se derivó del repo (regla de la Fase 5): mismos nombres de clases, métodos y
+      mensajes de consola.
+- **Resultado TP3: 100/100.** Sin observaciones nuevas; sigue abierta solo la observación menor
+  de normalización del DER del TP2 (ver Deuda conocida).
+- **Siguiente:** Fase 8 · TP4 · Versión final integradora.
 
 ---
 
@@ -301,8 +325,8 @@ trabajo o de generar documentación, para no desalinear el informe del código r
 - **Estado en el repo:** los pilares POO (herencia/polimorfismo en la jerarquía `Vehiculo`,
   encapsulamiento en el dominio, abstracción con `Vehiculo` abstracta) y el manejo de
   excepciones **ya están** (Fases 1-2). El **menú de selección interactivo** y los algoritmos
-  de ordenación/búsqueda **ya están** (Fase 6). **Falta:** el documento/presentación del TP3 y
-  ampliar la cobertura funcional más allá de la asignación.
+  de ordenación/búsqueda **ya están** (Fase 6). **Entregado y aprobado 100/100** (Fase 7). La ampliación de
+  cobertura funcional más allá de la asignación pasa al TP4.
 - **Formato:** PDF A4 Calibri 11, portada, `CABRERA-SERGIO-AP3.PDF`
   (⚠️ la plantilla de la consigna dice literalmente «AP1»; se asume **AP3** por el patrón AP1/AP2 —
   confirmar con la cátedra), enlace GitHub, APA; entrega incremental (correcciones previas).
