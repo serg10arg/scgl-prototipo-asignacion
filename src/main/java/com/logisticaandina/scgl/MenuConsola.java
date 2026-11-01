@@ -129,7 +129,7 @@ public class MenuConsola {
         } catch (AsignacionInvalidaException e) {
             System.out.println("  RECHAZADA (no se persiste): " + e.getMessage());
         } catch (PersistenciaException e) {
-            System.out.println("  ERROR de persistencia: " + e.getMessage());
+            System.out.println("  ERROR de persistencia: " + e.getDetalle());
         }
     }
 
@@ -145,7 +145,7 @@ public class MenuConsola {
                 imprimirSolicitudes(l);
             }
         } catch (PersistenciaException e) {
-            System.out.println("  ERROR de persistencia: " + e.getMessage());
+            System.out.println("  ERROR de persistencia: " + e.getDetalle());
         }
     }
 
@@ -161,7 +161,7 @@ public class MenuConsola {
             Algoritmos.ordenarPorCapacidadDesc(l);
             imprimirVehiculos(l);
         } catch (PersistenciaException e) {
-            System.out.println("  ERROR de persistencia: " + e.getMessage());
+            System.out.println("  ERROR de persistencia: " + e.getDetalle());
         }
     }
 
@@ -175,7 +175,7 @@ public class MenuConsola {
                 imprimirConductores(l);
             }
         } catch (PersistenciaException e) {
-            System.out.println("  ERROR de persistencia: " + e.getMessage());
+            System.out.println("  ERROR de persistencia: " + e.getDetalle());
         }
     }
 
@@ -200,7 +200,7 @@ public class MenuConsola {
                 System.out.println("  No se encontro ningun vehiculo con patente " + patente + ".");
             }
         } catch (PersistenciaException e) {
-            System.out.println("  ERROR de persistencia: " + e.getMessage());
+            System.out.println("  ERROR de persistencia: " + e.getDetalle());
         }
     }
 
@@ -218,7 +218,7 @@ public class MenuConsola {
                 imprimirConductores(hallados);
             }
         } catch (PersistenciaException e) {
-            System.out.println("  ERROR de persistencia: " + e.getMessage());
+            System.out.println("  ERROR de persistencia: " + e.getDetalle());
         }
     }
 
