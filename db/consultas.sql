@@ -45,3 +45,14 @@ SELECT o.id_orden, v.patente, o.tipo, o.estado, o.fecha
 FROM orden_mantenimiento o
 JOIN vehiculo v ON o.id_vehiculo = v.id_vehiculo
 WHERE o.estado = 'ABIERTA';
+
+-- Consulta 6 - Conductores y su licencia (RN3 / TP4: licencia en tabla propia).
+-- Muestra la vigencia de cada licencia a la fecha de hoy.
+SELECT c.nombre                                   AS conductor,
+       l.numero                                   AS licencia,
+       l.tipo,
+       l.fecha_vencimiento,
+       IF(l.fecha_vencimiento >= CURRENT_DATE, 'VIGENTE', 'VENCIDA') AS situacion
+FROM conductor c
+JOIN licencia l ON l.id_conductor = c.id_conductor
+ORDER BY l.fecha_vencimiento;

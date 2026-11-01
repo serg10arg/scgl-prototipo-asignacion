@@ -17,3 +17,7 @@ ORDER BY id_solicitud;
 -- debe FALLAR con error 1451 (foreign key constraint), evitando datos
 -- huerfanos. Se deja documentada como evidencia.
 -- DELETE FROM vehiculo WHERE id_vehiculo = 2;
+
+-- TP4: la licencia depende del conductor (fk_lic_conductor, RESTRICT). Borrar un
+-- conductor con licencia registrada tambien debe FALLAR con error 1451.
+-- DELETE FROM conductor WHERE id_conductor = 1;
